@@ -15,8 +15,9 @@ pub fn generate_html(items []Vopher_item) ?string {
 	html += '<meta charset="utf-8">'
 	html += '<title>Vopher Page</title>'
 	html += '</head>'
-	html += '<body>'
+	html += '<body>\r\n'
 
+	// The HTML could be simplified with a simple state machine
 	for e in items {
 		html += generate_html_tag(e) or { return error('Failed to generate HTML tag - ${err}') }
 		html += '\n'
@@ -38,13 +39,13 @@ pub fn generate_html_tag(item Vopher_item) ?string {
 
 	tag += match item.gopher_type {
 		.informationnal, .error {
-			'<p>${item.user_display}</p>'
+			'<pre>${item.user_display}</pre>'
 		}
 		.text_file, .submenu, .dos_file, .binary_file, .binhex_file {
-			'<ul><a href="${item.selector}">${item.user_display}</a></ul>'
+			'<ul><pre> - <a href="${item.selector}">${item.user_display}</a></pre></ul>'
 		}
 		else {
-			'${item.user_display}'
+			'${item.user_display.trim_space()}'
 		}
 	}
 
