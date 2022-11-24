@@ -1,4 +1,6 @@
 # Vopher
+
+![tests](https://github.com/SheatNoisette/vopher/actions/workflows/make.yml/badge.svg)
 A simple library to parse Gopher pages from a Gopher server. Basic Gopher+
 support is also included.
 
