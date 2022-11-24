@@ -19,7 +19,6 @@ $ v install --git https://github.com/SheatNoisette/vopher.git
 ```
 
 ## Quickstart
-
 A simple example to get a Gopher page and parse it
 ```v
 import vopher
@@ -52,6 +51,12 @@ For more examples, see the `examples` directory.
 Documentation can be generated using `v doc`:
 ```bash
 $ v doc . -m -f html docs/
+```
+
+## Tests
+Tests can be run using `v test`:
+```bash
+$ v -stats test .
 ```
 
 ## License
