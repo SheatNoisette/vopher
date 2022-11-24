@@ -53,13 +53,14 @@ enum Vopher_types {
 	informationnal
 }
 
+// A basic Gopher item, representing a line in a Gopher page
 struct Vopher_item {
 	gopher_type  Vopher_types // type of item
 	user_display string       // user display string
 	selector     string       // selector string
 	host         string       // host name
-	port         int    // port number
-	raw_string   string // The full line from the server
+	port         int          // port number
+	raw_string   string       // The full line from the server
 }
 
 // Parse a Gopher line into a Vopher_item struct

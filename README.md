@@ -41,9 +41,15 @@ gopher := vopher.parse_page(page_str) ?
 println(gopher)
 
 // Close the connection
-conn.close() or {}
+conn.close() ?
 ```
 For more examples, see the `examples` directory.
+
+## Documentation
+Documentation can be generated using `v doc`:
+```bash
+$ v doc . -m -f html docs/
+```
 
 ## License
 Licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

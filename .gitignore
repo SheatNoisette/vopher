@@ -16,3 +16,7 @@ bin/
 .idea/
 .vscode/
 *.iml
+
+# Ignore doc output
+_docs/
+docs/
