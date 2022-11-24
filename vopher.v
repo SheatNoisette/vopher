@@ -88,7 +88,7 @@ struct Vopher_item {
 }
 
 // Parse a Gopher line into a Vopher_item struct
-pub fn parse_line(input string) ?Vopher_item {
+pub fn parse_line(input string) !Vopher_item {
 	// Get the first character
 	if input.len == 0 {
 		return error('vopher: empty line')
@@ -134,7 +134,7 @@ pub fn parse_line(input string) ?Vopher_item {
 }
 
 // Parse a Gopher page into a list of Vopher_item
-pub fn parse_page(input string) ?[]Vopher_item {
+pub fn parse_page(input string) ![]Vopher_item {
 	mut items := []Vopher_item{}
 	lines := input.split('\r\n')
 	for line in lines {
