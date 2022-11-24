@@ -24,8 +24,20 @@ const (
 		`g`: Vopher_types.gif_file
 		`I`: Vopher_types.image_file
 		`T`: Vopher_types.telnet_3270
+		// Gopher+ types
+		`:`: Vopher_types.bitmap_file
+		`;`: Vopher_types.movie_file
+		`<`: Vopher_types.sound_file
 		// Extensions
+		`d`: Vopher_types.document_file
+		`h`: Vopher_types.html_file
 		`i`: Vopher_types.informationnal
+		`p`: Vopher_types.image_file
+		`r`: Vopher_types.rtf_file
+		// Same as `<`
+		`s`: Vopher_types.sound_file
+		`P`: Vopher_types.pdf_file
+		`X`: Vopher_types.xml_file
 	}
 
 	vopher_terminator = `.`
@@ -49,8 +61,17 @@ enum Vopher_types {
 	gif_file
 	image_file
 	telnet_3270
-	// extensions
+	// Gopher+
+	bitmap_file
+	movie_file
+	sound_file
+	// Extensions
 	informationnal
+	document_file
+	html_file
+	pdf_file
+	rtf_file
+	xml_file
 }
 
 // A basic Gopher item, representing a line in a Gopher page

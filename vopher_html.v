@@ -40,11 +40,11 @@ pub fn generate_html_tag(item Vopher_item) ?string {
 		.informationnal, .error {
 			'<p>${item.user_display}</p>'
 		}
-		.text_file, .submenu {
+		.text_file, .submenu, .dos_file, .binary_file, .binhex_file {
 			'<ul><a href="${item.selector}">${item.user_display}</a></ul>'
 		}
 		else {
-			''
+			'${item.user_display}'
 		}
 	}
 
