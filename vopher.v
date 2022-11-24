@@ -60,7 +60,10 @@ struct Vopher_item {
 	selector     string       // selector string
 	host         string       // host name
 	port         int          // port number
+
+	// Advanced usage
 	raw_string   string       // The full line from the server
+	raw_type	 u8           // The type as a string
 }
 
 // Parse a Gopher line into a Vopher_item struct
@@ -77,11 +80,8 @@ pub fn parse_line(input string) ?Vopher_item {
 	if first_char == vopher_terminator {
 		return Vopher_item{
 			gopher_type: Vopher_types.terminator
-			user_display: ''
-			selector: ''
-			host: ''
-			port: 0
 			raw_string: input
+			raw_type: first_char
 		}
 	}
 
@@ -108,6 +108,7 @@ pub fn parse_line(input string) ?Vopher_item {
 		host: fields[2]
 		port: fields[3].int()
 		raw_string: input
+		raw_type: first_char
 	}
 }
 
