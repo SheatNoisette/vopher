@@ -92,30 +92,37 @@ struct Vopher_item {
 	raw_type   string // The type as a string
 }
 
-// Parse a Gopher line into a Vopher_item struct
-pub fn parse_line(input string) !Vopher_item {
+// Custom line parsing struct
+struct Vopher_line_parser {
+	terminator  string // The terminator string
+	line_return string // The line return string
+	separator   string // The separator string
+}
+
+// Parse a line with a custom separator, line return and terminator
+pub fn parse_line_custom(line string, separator string, line_return string, terminator string) !Vopher_item {
 	// Get the first character
-	if input.len == 0 {
+	if line.len == 0 {
 		return error('vopher: empty line')
 	}
 
 	// Get the first character and split the line
 	// This should be improved to support Gopher+/Gemini and other extensions
-	first_char := input[0].ascii_str()
+	first_char := line[0].ascii_str()
 
 	// Check if it's a terminator
-	if first_char == vopher_default_terminator {
+	if first_char == terminator {
 		return Vopher_item{
 			gopher_type: Vopher_types.terminator
-			raw_string: input
+			raw_string: line
 			raw_type: first_char
 		}
 	}
 
-	rest := input[1..]
+	rest := line[1..]
 
 	// Split the line into fields
-	fields := rest.split(vopher_default_separator)
+	fields := rest.split(separator)
 
 	// Check if the line is valid
 	if fields.len < 3 {
@@ -137,15 +144,21 @@ pub fn parse_line(input string) !Vopher_item {
 		selector: fields[1]
 		host: fields[2]
 		port: port
-		raw_string: input
+		raw_string: line
 		raw_type: first_char
 	}
 }
 
-// Parse a Gopher page into a list of Vopher_item
-pub fn parse_page(input string) ![]Vopher_item {
+// Parse a Gopher line into a Vopher_item struct using default Gopher values
+pub fn parse_line(input string) !Vopher_item {
+	return parse_line_custom(input, vopher_default_separator, vopher_default_line_return,
+		vopher_default_terminator)
+}
+
+// Custom line parsing
+pub fn parse_page_custom(input string, parser Vopher_line_parser) ![]Vopher_item {
 	mut items := []Vopher_item{}
-	lines := input.split(vopher_default_line_return)
+	lines := input.split(parser.line_return)
 	for line in lines {
 		if line.len == 0 {
 			continue
@@ -154,4 +167,13 @@ pub fn parse_page(input string) ![]Vopher_item {
 		items << item
 	}
 	return items
+}
+
+// Parse a Gopher page into a list of Vopher_item
+pub fn parse_page(input string) ![]Vopher_item {
+	return parse_page_custom(input, Vopher_line_parser{
+		terminator: vopher_default_terminator
+		line_return: vopher_default_line_return
+		separator: vopher_default_separator
+	})
 }
