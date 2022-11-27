@@ -13,7 +13,7 @@ fn main() {
 	}
 
 	// Make a new connection
-	mut conn := net.dial_tcp(os.args[1] + ":70") or {
+	mut conn := net.dial_tcp(os.args[1] + ':70') or {
 		eprintln('error: could not connect to ${os.args[1]}')
 		return
 	}
@@ -30,12 +30,12 @@ fn main() {
 
 	// Parse the response
 	gopher := vopher.parse_page(page_str) or {
-		eprintln('error: $err')
+		eprintln('error: ${err}')
 		return
 	}
 
 	html := vopher.generate_html(gopher) or {
-		eprintln('error: $err')
+		eprintln('error: ${err}')
 		return
 	}
 

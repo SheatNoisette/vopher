@@ -28,7 +28,7 @@ fn test_unknown_type() {
 		return
 	}
 	assert out.gopher_type == Vopher_types.unknown
-	assert out.raw_type.ascii_str() == 'Q'
+	assert out.raw_type == 'Q'
 }
 
 // Terminator line
@@ -39,5 +39,45 @@ fn test_terminator() {
 		return
 	}
 	assert out.gopher_type == Vopher_types.terminator
-	assert out.raw_type.ascii_str() == '.'
+	assert out.raw_type == '.'
+}
+
+// Invalid port
+fn test_invalid_port() {
+	line := 'iInvalid port\t\tnull.host\tinvalid'
+	out := parse_line(line) or {
+		assert true
+		return
+	}
+	assert false
+}
+
+// Not a valid line
+fn test_invalid_line() {
+	line := 'I dont know what I am doing'
+	out := parse_line(line) or {
+		assert true
+		return
+	}
+	assert false
+}
+
+// Valid selector but invalid line
+fn test_invalid_line2() {
+	line := 'iInvalid line'
+	out := parse_line(line) or {
+		assert true
+		return
+	}
+	assert false
+}
+
+// Valid line but use spaces instead of tabs
+fn test_spaces() {
+	line := 'iSpaces ok null.host 1'
+	out := parse_line(line) or {
+		assert true
+		return
+	}
+	assert false
 }
