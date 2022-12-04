@@ -8,7 +8,7 @@ import os
 
 // Simple Gopher Proxy for Hacker News
 // It is a simple example of how to use the vopher module and was not
-// intended to be a full featured proxy.
+// intended to be a fast fully featured proxy.
 
 const (
 	hacker_news_api = 'https://hacker-news.firebaseio.com/v0/'
@@ -26,7 +26,7 @@ fn (st Story) to_gopher_item() vopher.Vopher_item {
 		gopher_type: vopher.Vopher_types.submenu
 		user_display: st.title
 		selector: ''
-		host: st.title
+		host: st.url
 		port: 80
 	}
 }
@@ -36,6 +36,24 @@ fn handle_client(mut socket net.TcpConn, page string) {
 	eprintln('> new client: ${client_addr}')
 	socket.write_string(page) or { return }
 	socket.close() or { return }
+}
+
+fn add_header(mut stories []vopher.Vopher_item) {
+	stories << vopher.Vopher_item{
+		gopher_type: vopher.Vopher_types.informationnal
+		user_display: 'Hacker News Proxy'
+		selector: ''
+		host: 'dontcare.com'
+		port: 0
+	}
+	// Add a blank line
+	stories << vopher.Vopher_item{
+		gopher_type: vopher.Vopher_types.informationnal
+		user_display: ''
+		selector: ''
+		host: 'dontcare.com'
+		port: 0
+	}
 }
 
 fn main() {
@@ -57,6 +75,9 @@ fn main() {
 		println('failed to decode top stories')
 		return
 	}
+
+	println('Add pre-defined items...')
+	add_header(mut stories)
 
 	println('Getting top stories...')
 
