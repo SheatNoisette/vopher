@@ -11,7 +11,7 @@ import strconv
 */
 
 // Basic types for Gopher protocol
-enum Vopher_types {
+pub enum Vopher_types {
 	unknown // Special type if something goes wrong
 	terminator // Special type for the terminator '.'
 	text_file
@@ -42,7 +42,7 @@ enum Vopher_types {
 }
 
 // A basic Gopher item, representing a line in a Gopher page
-struct Vopher_item {
+pub struct Vopher_item {
 	gopher_type  Vopher_types // type of item
 	user_display string       // user display string
 	selector     string       // selector string
@@ -54,7 +54,7 @@ struct Vopher_item {
 }
 
 // Custom line parsing struct
-struct Vopher_line_parser {
+pub struct Vopher_line_parser {
 	terminator  string // The terminator string
 	line_return string // The line return string
 	separator   string // The separator string
@@ -173,6 +173,28 @@ pub fn build_line_custom(item Vopher_item, parser Vopher_line_parser) !string {
 // Build a Gopher line from a Vopher_item using default Gopher values
 pub fn build_line(item Vopher_item) !string {
 	return build_line_custom(item, Vopher_line_parser{
+		terminator: vopher_default_terminator
+		line_return: vopher_default_line_return
+		separator: vopher_default_separator
+	})
+}
+
+// Create a page from a list of Vopher_item
+// Add a terminator at the end
+pub fn build_page_custom(items []Vopher_item, parser Vopher_line_parser) !string {
+	mut page := ''
+	for item in items {
+		page += build_line(item) or { return error('vopher: ${err}') }
+	}
+	// Add the terminator
+	page += parser.terminator + parser.line_return
+	return page
+}
+
+// Create a page from a list of Vopher_item using default Gopher values
+// Add a terminator at the end
+pub fn build_page(items []Vopher_item) !string {
+	return build_page_custom(items, Vopher_line_parser{
 		terminator: vopher_default_terminator
 		line_return: vopher_default_line_return
 		separator: vopher_default_separator
