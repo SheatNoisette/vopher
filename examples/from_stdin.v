@@ -3,7 +3,7 @@ module main
 import vopher
 import os
 
-fn main () {
+fn main() {
 	if os.args.len != 1 {
 		println('No arguments needed')
 		return
@@ -12,9 +12,9 @@ fn main () {
 	// Get from stdin
 	line := os.get_line()
 	parse := vopher.parse_line(line) or {
-		println('Error parsing line: $err')
+		println('Error parsing line: ${err}')
 		exit(1)
 	}
 
-	println('Parsed line: $parse')
+	println('Parsed line: ${parse}')
 }

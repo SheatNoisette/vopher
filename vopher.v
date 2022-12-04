@@ -10,45 +10,6 @@ import strconv
 ** Licenced under the MIT licence.
 */
 
-const (
-	vopher_str_to_types = {
-		'0': Vopher_types.text_file
-		'1': Vopher_types.submenu
-		'2': Vopher_types.ccso_nameserver
-		'3': Vopher_types.error
-		'4': Vopher_types.binhex_file
-		'5': Vopher_types.dos_file
-		'6': Vopher_types.uuencoded_file
-		'7': Vopher_types.full_text_search
-		'8': Vopher_types.telnet
-		'9': Vopher_types.binary_file
-		'+': Vopher_types.mirror
-		'g': Vopher_types.gif_file
-		'I': Vopher_types.image_file
-		'T': Vopher_types.telnet_3270
-		// Gopher+ types
-		':': Vopher_types.bitmap_file
-		';': Vopher_types.movie_file
-		'<': Vopher_types.sound_file
-		// Extensions
-		'd': Vopher_types.document_file
-		'h': Vopher_types.html_file
-		'i': Vopher_types.informationnal
-		'p': Vopher_types.image_file
-		'r': Vopher_types.rtf_file
-		// Same as `<`
-		's': Vopher_types.sound_file
-		'P': Vopher_types.pdf_file
-		'X': Vopher_types.xml_file
-	}
-
-	vopher_default_terminator  = '.'
-
-	vopher_default_line_return = '\r\n'
-
-	vopher_default_separator   = '\t'
-)
-
 // Basic types for Gopher protocol
 enum Vopher_types {
 	unknown // Special type if something goes wrong
@@ -100,7 +61,7 @@ struct Vopher_line_parser {
 }
 
 // Parse a line with a custom separator, line return and terminator
-pub fn parse_line_custom(line string, separator string, line_return string, terminator string) !Vopher_item {
+pub fn parse_line_custom(line string, parser Vopher_line_parser) !Vopher_item {
 	// Get the first character
 	if line.len == 0 {
 		return error('vopher: empty line')
@@ -111,7 +72,7 @@ pub fn parse_line_custom(line string, separator string, line_return string, term
 	first_char := line[0].ascii_str()
 
 	// Check if it's a terminator
-	if first_char == terminator {
+	if first_char == parser.terminator {
 		return Vopher_item{
 			gopher_type: Vopher_types.terminator
 			raw_string: line
@@ -122,7 +83,7 @@ pub fn parse_line_custom(line string, separator string, line_return string, term
 	rest := line[1..]
 
 	// Split the line into fields
-	fields := rest.split(separator)
+	fields := rest.split(parser.separator)
 
 	// Check if the line is valid
 	if fields.len < 3 {
@@ -136,7 +97,9 @@ pub fn parse_line_custom(line string, separator string, line_return string, term
 	}
 
 	// Parse port
-	port := strconv.atoi(fields[3]) or { return error('vopher: invalid port number - ${err}') }
+	port := strconv.atoi(fields[3].replace(parser.line_return, '')) or {
+		return error('vopher: invalid port number - ${err}')
+	}
 
 	return Vopher_item{
 		gopher_type: gopher_type
@@ -151,8 +114,11 @@ pub fn parse_line_custom(line string, separator string, line_return string, term
 
 // Parse a Gopher line into a Vopher_item struct using default Gopher values
 pub fn parse_line(input string) !Vopher_item {
-	return parse_line_custom(input, vopher_default_separator, vopher_default_line_return,
-		vopher_default_terminator)
+	return parse_line_custom(input, Vopher_line_parser{
+		terminator: vopher_default_terminator
+		line_return: vopher_default_line_return
+		separator: vopher_default_separator
+	})
 }
 
 // Custom line parsing
@@ -176,4 +142,67 @@ pub fn parse_page(input string) ![]Vopher_item {
 		line_return: vopher_default_line_return
 		separator: vopher_default_separator
 	})
+}
+
+// Build a Gopher line from a Vopher_item
+// Note: raw_string and raw_type are not used
+pub fn build_line_custom(item Vopher_item, parser Vopher_line_parser) !string {
+	// Builder style approach
+	mut line := ''
+
+	// The terminator is a special case
+	if item.gopher_type == Vopher_types.terminator {
+		line += parser.terminator + parser.line_return
+		return line
+	} else if item.gopher_type in vopher_types_to_str {
+		line += vopher_types_to_str[item.gopher_type]
+	} else {
+		// Not a valid type
+		return error('vopher: invalid type, got ${item.gopher_type}')
+	}
+
+	// Add the fields
+	line += item.user_display + parser.separator
+	line += item.selector + parser.separator
+	line += item.host + parser.separator
+	line += item.port.str() + parser.line_return
+
+	return line
+}
+
+// Build a Gopher line from a Vopher_item using default Gopher values
+pub fn build_line(item Vopher_item) !string {
+	return build_line_custom(item, Vopher_line_parser{
+		terminator: vopher_default_terminator
+		line_return: vopher_default_line_return
+		separator: vopher_default_separator
+	})
+}
+
+// Simple alias for Vopher_item to build a Gopher line
+// See build_line for more details
+[inline]
+pub fn (item Vopher_item) to_gopher() !string {
+	return build_line(item)
+}
+
+// Simple alias for Vopher_item to build a Gopher line with extra arguments
+// See parse_line_custom for more details
+[inline]
+pub fn (item Vopher_item) to_gopher_custom(parser Vopher_line_parser) !string {
+	return build_line_custom(item, parser)
+}
+
+// Alias for Vopher_item to parse a Gopher line
+// See parse_line for more details
+[inline]
+pub fn from_gopher(line string) !Vopher_item {
+	return parse_line(line)
+}
+
+// Alias for Vopher_item to parse a Gopher line with extra arguments
+// See parse_line_custom for more details
+[inline]
+pub fn from_gopher_custom(line string, parser Vopher_line_parser) !Vopher_item {
+	return parse_line_custom(line, parser)
 }
